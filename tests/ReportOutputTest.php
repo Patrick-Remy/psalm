@@ -295,6 +295,21 @@ class ReportOutputTest extends TestCase
                                                             'region' => [
                                                                 'startLine' => 7,
                                                                 'endLine' => 7,
+                                                                'startColumn' => 17,
+                                                                'endColumn' => 60,
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                                [
+                                                    'location' => [
+                                                        'physicalLocation' => [
+                                                            'artifactLocation' => [
+                                                                'uri' => 'taintflow-test/vulnerable.php',
+                                                            ],
+                                                            'region' => [
+                                                                'startLine' => 7,
+                                                                'endLine' => 7,
                                                                 'startColumn' => 1,
                                                                 'endColumn' => 14,
                                                             ],
@@ -437,6 +452,21 @@ class ReportOutputTest extends TestCase
                                                                 'endLine' => 3,
                                                                 'startColumn' => 45,
                                                                 'endColumn' => 51,
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                                [
+                                                    'location' => [
+                                                        'physicalLocation' => [
+                                                            'artifactLocation' => [
+                                                                'uri' => 'taintflow-test/vulnerable.php',
+                                                            ],
+                                                            'region' => [
+                                                                'startLine' => 7,
+                                                                'endLine' => 7,
+                                                                'startColumn' => 17,
+                                                                'endColumn' => 60,
                                                             ],
                                                         ],
                                                     ],
@@ -620,6 +650,21 @@ class ReportOutputTest extends TestCase
                                                             'region' => [
                                                                 'startLine' => 7,
                                                                 'endLine' => 7,
+                                                                'startColumn' => 17,
+                                                                'endColumn' => 60,
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                                [
+                                                    'location' => [
+                                                        'physicalLocation' => [
+                                                            'artifactLocation' => [
+                                                                'uri' => 'taintflow-test/vulnerable.php',
+                                                            ],
+                                                            'region' => [
+                                                                'startLine' => 7,
+                                                                'endLine' => 7,
                                                                 'startColumn' => 1,
                                                                 'endColumn' => 14,
                                                             ],
@@ -669,9 +714,10 @@ class ReportOutputTest extends TestCase
 
         $sarif_report_options = ProjectAnalyzer::getFileReportOptions([__DIR__ . '/test-report.sarif'])[0];
 
+        $issue_result = IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sarif_report_options);
         $this->assertSame(
             $issue_data,
-            json_decode(IssueBuffer::getOutput(IssueBuffer::getIssuesData(), $sarif_report_options), true, 512, JSON_THROW_ON_ERROR),
+            json_decode($issue_result, true, 512, JSON_THROW_ON_ERROR),
         );
     }
 
