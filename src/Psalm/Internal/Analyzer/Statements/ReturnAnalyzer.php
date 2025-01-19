@@ -44,6 +44,8 @@ use Psalm\Type\Atomic\TClassString;
 use Psalm\Type\Atomic\TClosure;
 use Psalm\Type\Union;
 
+use function array_merge;
+use function array_unique;
 use function count;
 use function explode;
 use function implode;
@@ -246,7 +248,7 @@ final class ReturnAnalyzer
                         $cased_method_id,
                         $inferred_type,
                         $storage,
-                        $context
+                        $context,
                     );
                 }
 
@@ -586,14 +588,14 @@ final class ReturnAnalyzer
         $storage->added_taints = array_unique(
             array_merge(
                 $storage->added_taints,
-                $added_taints
-            )
+                $added_taints,
+            ),
         );
         $storage->removed_taints = array_unique(
             array_merge(
                 $storage->removed_taints,
                 $codebase->config->eventDispatcher->dispatchRemoveTaints($event),
-            )
+            ),
         );
 
         if ($inferred_type->parent_nodes) {
