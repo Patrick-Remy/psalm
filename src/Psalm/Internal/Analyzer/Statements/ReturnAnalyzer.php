@@ -34,6 +34,7 @@ use Psalm\Issue\MixedReturnTypeCoercion;
 use Psalm\Issue\NoValue;
 use Psalm\Issue\NullableReturnStatement;
 use Psalm\IssueBuffer;
+use Psalm\Plugin\EventHandler\Event\AddRemoveTaintsEvent;
 use Psalm\Storage\FunctionLikeStorage;
 use Psalm\Storage\MethodStorage;
 use Psalm\Type;
@@ -245,6 +246,7 @@ final class ReturnAnalyzer
                         $cased_method_id,
                         $inferred_type,
                         $storage,
+                        $context
                     );
                 }
 
@@ -558,7 +560,8 @@ final class ReturnAnalyzer
         PhpParser\Node\Stmt\Return_ $stmt,
         string $cased_method_id,
         Union $inferred_type,
-        FunctionLikeStorage $storage
+        FunctionLikeStorage $storage,
+        Context $context
     ): void {
         if (!$statements_analyzer->data_flow_graph instanceof TaintFlowGraph
             || !$stmt->expr
@@ -574,6 +577,24 @@ final class ReturnAnalyzer
         );
 
         $statements_analyzer->data_flow_graph->addNode($method_node);
+
+        $codebase = $statements_analyzer->getCodebase();
+
+        $event = new AddRemoveTaintsEvent($stmt->expr, $context, $statements_analyzer, $codebase);
+
+        $added_taints = $codebase->config->eventDispatcher->dispatchAddTaints($event);
+        $storage->added_taints = array_unique(
+            array_merge(
+                $storage->added_taints,
+                $added_taints
+            )
+        );
+        $storage->removed_taints = array_unique(
+            array_merge(
+                $storage->removed_taints,
+                $codebase->config->eventDispatcher->dispatchRemoveTaints($event),
+            )
+        );
 
         if ($inferred_type->parent_nodes) {
             foreach ($inferred_type->parent_nodes as $parent_node) {
